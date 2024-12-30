@@ -6,8 +6,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class VaultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val items = mutableListOf<VaultItem>()
+class VaultAdapter(
+    private var items: List<VaultItem> = emptyList(),
+    private val onItemClick: (VaultItem) -> Unit = {}
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+        private const val VIEW_TYPE_LOGIN = 0
+        private const val VIEW_TYPE_CARD = 1
+        private const val VIEW_TYPE_NOTE = 2
+        private const val VIEW_TYPE_IDENTITY = 3
+    }
 
     class LoginViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.findViewById(R.id.titleText)
@@ -27,67 +36,70 @@ class VaultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val contentText: TextView = view.findViewById(R.id.contentText)
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
-            is VaultItem.Login -> VIEW_TYPE_LOGIN
-            is VaultItem.CreditCard -> VIEW_TYPE_CARD
-            is VaultItem.Note -> VIEW_TYPE_NOTE
-        }
+    class IdentityViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val titleText: TextView = view.findViewById(R.id.titleText)
+        val fullNameText: TextView = view.findViewById(R.id.fullNameText)
+        val emailText: TextView = view.findViewById(R.id.emailText)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_LOGIN -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_login, parent, false)
-                LoginViewHolder(view)
-            }
-            VIEW_TYPE_CARD -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_card, parent, false)
-                CardViewHolder(view)
-            }
-            else -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_note, parent, false)
-                NoteViewHolder(view)
-            }
+            VIEW_TYPE_LOGIN -> LoginViewHolder(inflater.inflate(R.layout.item_login, parent, false))
+            VIEW_TYPE_CARD -> CardViewHolder(inflater.inflate(R.layout.item_card, parent, false))
+            VIEW_TYPE_NOTE -> NoteViewHolder(inflater.inflate(R.layout.item_note, parent, false))
+            VIEW_TYPE_IDENTITY -> IdentityViewHolder(inflater.inflate(R.layout.item_identity, parent, false))
+            else -> throw IllegalArgumentException("Invalid view type")
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = items[position]) {
-            is VaultItem.Login -> {
-                val loginHolder = holder as LoginViewHolder
-                loginHolder.titleText.text = item.title
-                loginHolder.usernameText.text = item.username
-                loginHolder.passwordText.text = item.password
-            }
-            is VaultItem.CreditCard -> {
-                val cardHolder = holder as CardViewHolder
-                cardHolder.titleText.text = item.title
-                cardHolder.cardNumberText.text = item.cardNumber
-                cardHolder.expiryText.text = item.expiryDate
-                cardHolder.cvvText.text = item.cvv
-            }
-            is VaultItem.Note -> {
-                val noteHolder = holder as NoteViewHolder
-                noteHolder.titleText.text = item.title
-                noteHolder.contentText.text = item.content
-            }
+        val item = items[position]
+        holder.itemView.setOnClickListener { onItemClick(item) }
+        
+        when (holder) {
+            is LoginViewHolder -> bindLoginViewHolder(holder, item as VaultItem.Login)
+            is CardViewHolder -> bindCardViewHolder(holder, item as VaultItem.Card)
+            is NoteViewHolder -> bindNoteViewHolder(holder, item as VaultItem.Note)
+            is IdentityViewHolder -> bindIdentityViewHolder(holder, item as VaultItem.Identity)
         }
+    }
+
+    private fun bindLoginViewHolder(holder: LoginViewHolder, item: VaultItem.Login) {
+        holder.titleText.text = item.title
+        holder.usernameText.text = item.username
+        holder.passwordText.text = "••••••••"
+    }
+
+    private fun bindCardViewHolder(holder: CardViewHolder, item: VaultItem.Card) {
+        holder.titleText.text = item.title
+        holder.cardNumberText.text = "****${item.cardNumber.takeLast(4)}"
+        holder.expiryText.text = "${item.expiryMonth}/${item.expiryYear}"
+        holder.cvvText.text = "***"
+    }
+
+    private fun bindNoteViewHolder(holder: NoteViewHolder, item: VaultItem.Note) {
+        holder.titleText.text = item.title
+        holder.contentText.text = item.content
+    }
+
+    private fun bindIdentityViewHolder(holder: IdentityViewHolder, item: VaultItem.Identity) {
+        holder.titleText.text = item.title
+        holder.fullNameText.text = "${item.firstName} ${item.lastName}"
+        holder.emailText.text = item.email
     }
 
     override fun getItemCount() = items.size
 
-    fun addItem(item: VaultItem) {
-        items.add(item)
-        notifyItemInserted(items.size - 1)
+    override fun getItemViewType(position: Int) = when (items[position]) {
+        is VaultItem.Login -> VIEW_TYPE_LOGIN
+        is VaultItem.Card -> VIEW_TYPE_CARD
+        is VaultItem.Note -> VIEW_TYPE_NOTE
+        is VaultItem.Identity -> VIEW_TYPE_IDENTITY
     }
 
-    companion object {
-        private const val VIEW_TYPE_LOGIN = 0
-        private const val VIEW_TYPE_CARD = 1
-        private const val VIEW_TYPE_NOTE = 2
+    fun updateItems(newItems: List<VaultItem>) {
+        items = newItems
+        notifyDataSetChanged()
     }
 }

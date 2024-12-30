@@ -1,10 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.VaultSpec" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Color attributes -->
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/background</item>
-        <item name="colorAccent">@color/secondary</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:statusBarColor">@color/background</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorSecondary">@color/accent_blue</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:colorBackground">@color/background</item>
+        
+        <!-- Text colors -->
+        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorOnSecondary">@color/text_primary</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnError">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        
+        <!-- System bars -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- Shape appearances -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Large</item>
+
+        <!-- SearchView style -->
+        <item name="searchViewStyle">@style/SearchViewStyle</item>
+        
+        <!-- Enable edge-to-edge -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+
+    <!-- Shape Appearances -->
+    <style name="ShapeAppearance.Small" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Medium" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Large" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <!-- SearchView Style -->
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@null</item>
+        <item name="submitBackground">@null</item>
+        <item name="searchIcon">@drawable/ic_search</item>
+        <item name="queryHint">@string/search_hint</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 </resources>
